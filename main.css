@@ -1,0 +1,6 @@
+.input_box {
+	position: absolute;
+	top: 50%;
+	left: 20%;
+	transform: translateY(-50%);
+}
