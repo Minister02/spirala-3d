@@ -6,21 +6,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./main.css">
     <style>
         body {
             margin: 0;
+            height: 100vh;
         }
 
         canvas {
             width: 100%;
             height: 100%;
         }
+
+        .input_box {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            width: 250px;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+        }
+
+        .input_box input {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
-    <div class="input_box"><input type="range" id="stepRange" min="5" max="100" step="1" value="20" /></div>
+    <div class="input_box">
+        <label for="numberOfSteps" id="numberOfStepsStats"></label>
+        <input type="range" id="numberOfSteps" min="5" max="200" step="1" value="20" />
+        <label for="stepHeight" id="stepHeightStats"></label>
+        <input type="range" id="stepHeight" min="0.01" max="2" step="0.01" value="0.02" />
+        <label for="stepWidth" id="stepWidthStats"></label>
+        <input type="range" id="stepWidth" min="1" max="10" step="1" value="5" />
+        <label for="geoCorner" id="geoCornerStats"></label>
+        <input type="range" id="geoCorner" min="1" max="25" step="0.5" value="5" />
+        <label for="geoRadius" id="geoRadiusStats"></label>
+        <input type="range" id="geoRadius" min="1" max="25" step="0.5" value="5" />
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     <script src="./main.js"></script>

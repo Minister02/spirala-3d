@@ -1,53 +1,118 @@
-// Inicjalizacja zmiennych
-let numberOfSteps = 20;
-const stepHeight = 0.2;
-const stepWidth = 2;
-const input = document.getElementById('stepRange');
+// Zmienne globalne
+let scene, camera, renderer;
 
-// Inicjalizacja sceny i kamery
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-	75,
-	window.innerWidth / window.innerHeight,
-	0.1,
-	1000
-);
+// Główna funkcja inicjująca
+function init() {
+	// Inicjalizacja zmiennych
+	const inputNumberOfSteps = document.getElementById('numberOfSteps');
+	const inputStepHeight = document.getElementById('stepHeight');
+	const inputStepWidth = document.getElementById('stepWidth');
+	const inputGeoCorner = document.getElementById('geoCorner');
+	const inputGeoRadius = document.getElementById('geoRadius');
 
-// Wygładzenie krawędzi stopni
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+	// Tagi label z akutalnymi parametrami
+	const inputNumberOfStepsStats = document.getElementById('numberOfStepsStats');
+	const inputStepHeightStats = document.getElementById('stepHeightStats');
+	const inputStepWidthStats = document.getElementById('stepWidthStats');
+	const inputGeoCornerStats = document.getElementById('geoCornerStats');
+	const inputGeoRadiusStats = document.getElementById('geoRadiusStats');
 
-renderer.setSize(window.innerWidth, window.innerHeight); // Ustawiamy rozmiar rendera na rozmiar okna przeglądarki (window)
-document.body.appendChild(renderer.domElement); // Dodanie elementu rendera do dokumentu HTML
+	let stepWidth = parseFloat(inputStepWidth.value);
+	let stepHeight = parseFloat(inputStepHeight.value);
 
-// Tworzenie kształtu schodów
-const stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepWidth);
-// Ustawienie koloru materiału
-const stepMaterial = new THREE.MeshBasicMaterial({ color: 0x345995 });
+	// Inicjalizacja sceny i kamery
+	scene = new THREE.Scene();
+	camera = new THREE.PerspectiveCamera(
+		75,
+		window.innerWidth / window.innerHeight,
+		0.1,
+		1000
+	);
 
-// Tworzenie obiektu Mesh dla każdego stopnia
-function createSteps() {
-	for (let i = 0; i < numberOfSteps; i++) {
-		const stepMesh = new THREE.Mesh(stepGeometry, stepMaterial);
+	// Wygładzenie krawędzi stopni
+	renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	scene.background = new THREE.Color(0xffffff);
+	document.body.appendChild(renderer.domElement);
 
-		// Ustawianie pozycji i obrót dla każdego stopnia (spiralny układ)
-		const angle = i * (Math.PI / 180) * 10; // Kąt obrotu
-		const radius = 5; // Promień spiralny
-		const x = radius * Math.cos(angle); // Odleglość od osi X
-		const y = i * stepHeight; // Podnosimy wysokość spirali o wysokość stopnia na osi Y
-		const z = radius * Math.sin(angle); // Odleglość od osi Z
-		stepMesh.position.set(x, y, z); // Ustawiamy współrzędne
-		stepMesh.rotation.y = -angle; // Ustawienie rotacji stopnia
+	// Tworzenie kształtu schodów
+	let stepGeometry = new THREE.BoxGeometry(5, 0.2, 5);
+	const texture = new THREE.TextureLoader().load('textures/woodenplates.jpg');
+	const stepMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
-		scene.add(stepMesh);
+	// Utworzenie możliwości ruchu kamerą
+	const controls = new THREE.OrbitControls(camera, renderer.domElement);
+	controls.target.set(0, 8, 0);
+	scene.add(controls);
+
+	// Ustawianie kamery
+	camera.position.set(20, 20, 20);
+	camera.lookAt(new THREE.Vector3(0, 8, 0));
+
+	// Tworzenie obiektu Mesh dla każdego stopnia
+	function createSteps() {
+		numberOfSteps = parseInt(inputNumberOfSteps.value);
+
+		for (let i = 0; i < numberOfSteps; i++) {
+			stepHeight = parseFloat(inputStepHeight.value);
+			stepWidth = parseFloat(inputStepWidth.value);
+			geoCorner = parseInt(inputGeoCorner.value);
+			geoRadius = parseInt(inputGeoRadius.value);
+
+			const stepMesh = new THREE.Mesh(stepGeometry, stepMaterial);
+
+			// Ustawianie pozycji i obrót dla każdego stopnia (spiralny układ)
+			const angle = i * (Math.PI / 180) * geoCorner; // Kąt obrotu
+			const radius = geoRadius; // Promień spiralny
+			const x = radius * Math.cos(angle); // Odleglość od osi X
+			const y = i * stepHeight; // Podnosimy wysokość spirali o wysokość stopnia na osi Y
+			const z = radius * Math.sin(angle); // Odleglość od osi Z
+			stepMesh.position.set(x, y, z); // Ustawiamy współrzędne
+			stepMesh.rotation.y = -angle; // Ustawienie rotacji stopnia
+
+			scene.add(stepMesh);
+		}
 	}
+
+	function disposeGeometry() {
+		stepGeometry.dispose();
+		stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepWidth);
+	}
+
+	// Funkcja aktualizująca wygląd schodów
+	function updateGeometry() {
+		disposeGeometry();
+		resetScene();
+		createSteps();
+		updateStats();
+	}
+
+	function updateStats() {
+		inputNumberOfStepsStats.textContent =
+			'Liczba stopni spirali: ' + numberOfSteps;
+		inputStepHeightStats.textContent =
+			'Wysokośc jednego stopnia: ' + stepHeight;
+		inputStepWidthStats.textContent = 'Szerokość jednego stopnia: ' + stepWidth;
+		inputGeoCornerStats.textContent =
+			'Kąt wychylenia jednego stopnia: ' + geoCorner;
+		inputGeoRadiusStats.textContent = 'Promień spirali: ' + geoRadius;
+	}
+
+	// Nasłuchiwacze na suwaki
+	inputNumberOfSteps.addEventListener('input', updateGeometry);
+
+	inputStepHeight.addEventListener('input', updateGeometry);
+
+	inputStepWidth.addEventListener('input', updateGeometry);
+
+	inputGeoCorner.addEventListener('input', updateGeometry);
+
+	inputGeoRadius.addEventListener('input', updateGeometry);
+
+	// Wywołanie funkcji pierwszy raz
+	createSteps();
+	updateGeometry();
 }
-
-// Wywołanie funkcji
-createSteps();
-
-// Ustawianie kamery
-camera.position.set(20, 20, 20); // Ustawienie pozycji kamery
-camera.lookAt(new THREE.Vector3(0, 10, 0)); // Skierowanie kamery na punkt (0, 10, 0)
 
 // Renderowanie sceny
 function animate() {
@@ -55,18 +120,21 @@ function animate() {
 	renderer.render(scene, camera);
 }
 
-animate(); // wywołanie funkcji renderowania sceny
-
-// Funkcja aktualizująca ilość stopni na podstawie wartości suwaka
-input.addEventListener('input', () => {
-	numberOfSteps = parseInt(input.value);
-	resetScene();
-	createSteps();
-});
-
 // Funkcja resetująca scenę
 function resetScene() {
 	while (scene.children.length > 0) {
 		scene.remove(scene.children[0]);
 	}
 }
+
+// Funkcja ustawiająca spiralę zawsze na środku ekranu przy zmiane szerokości okna przeglądarki
+function onWindowResize() {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.addEventListener('resize', onWindowResize, false);
+
+init();
+animate();
