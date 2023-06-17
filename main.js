@@ -87,6 +87,7 @@ function init() {
 		updateStats();
 	}
 
+	// Funkcja aktualizująca na bieżąco aktualne parametry kontrolerów
 	function updateStats() {
 		inputNumberOfStepsStats.textContent =
 			'Liczba stopni spirali: ' + numberOfSteps;
