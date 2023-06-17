@@ -17,9 +17,6 @@ function init() {
 	const inputGeoCornerStats = document.getElementById('geoCornerStats');
 	const inputGeoRadiusStats = document.getElementById('geoRadiusStats');
 
-	let stepWidth = parseFloat(inputStepWidth.value);
-	let stepHeight = parseFloat(inputStepHeight.value);
-
 	// Inicjalizacja sceny i kamery
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(
@@ -51,15 +48,16 @@ function init() {
 
 	// Tworzenie obiektu Mesh dla każdego stopnia
 	function createSteps() {
-		numberOfSteps = parseInt(inputNumberOfSteps.value);
+		const numberOfSteps = parseInt(inputNumberOfSteps.value);
 
 		for (let i = 0; i < numberOfSteps; i++) {
-			stepHeight = parseFloat(inputStepHeight.value);
-			stepWidth = parseFloat(inputStepWidth.value);
-			geoCorner = parseInt(inputGeoCorner.value);
-			geoRadius = parseInt(inputGeoRadius.value);
+			const stepWidth = parseFloat(inputStepWidth.value);
+			const stepHeight = parseFloat(inputStepHeight.value);
+			const geoCorner = parseInt(inputGeoCorner.value);
+			const geoRadius = parseInt(inputGeoRadius.value);
 
 			const stepMesh = new THREE.Mesh(stepGeometry, stepMaterial);
+			stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepWidth);
 
 			// Ustawianie pozycji i obrót dla każdego stopnia (spiralny układ)
 			const angle = i * (Math.PI / 180) * geoCorner; // Kąt obrotu
@@ -74,14 +72,9 @@ function init() {
 		}
 	}
 
-	function disposeGeometry() {
-		stepGeometry.dispose();
-		stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepWidth);
-	}
-
 	// Funkcja aktualizująca wygląd schodów
 	function updateGeometry() {
-		disposeGeometry();
+		stepGeometry.dispose();
 		resetScene();
 		createSteps();
 		updateStats();
@@ -90,13 +83,15 @@ function init() {
 	// Funkcja aktualizująca na bieżąco aktualne parametry kontrolerów
 	function updateStats() {
 		inputNumberOfStepsStats.textContent =
-			'Liczba stopni spirali: ' + numberOfSteps;
+			'Liczba stopni spirali: ' + inputNumberOfSteps.value;
 		inputStepHeightStats.textContent =
-			'Wysokośc jednego stopnia: ' + stepHeight;
-		inputStepWidthStats.textContent = 'Szerokość jednego stopnia: ' + stepWidth;
+			'Wysokośc jednego stopnia: ' + inputStepHeight.value;
+		inputStepWidthStats.textContent =
+			'Szerokość jednego stopnia: ' + inputStepWidth.value;
 		inputGeoCornerStats.textContent =
-			'Kąt wychylenia jednego stopnia: ' + geoCorner;
-		inputGeoRadiusStats.textContent = 'Promień spirali: ' + geoRadius;
+			'Kąt wychylenia jednego stopnia: ' + inputGeoCorner.value;
+		inputGeoRadiusStats.textContent =
+			'Promień spirali: ' + inputGeoRadius.value;
 	}
 
 	// Nasłuchiwacze na suwaki
